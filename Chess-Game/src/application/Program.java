@@ -22,7 +22,7 @@ public class Program {
 		while (true) {
 			try {
 				UI.clearSreen();
-				UI.printBoard(cm.getPieces());
+				UI.printMatch(cm);
 				System.out.println();
 				System.out.println("Source: ");
 				ChessPosition source = UI.readChessPosition(scn);
