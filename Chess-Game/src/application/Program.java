@@ -22,7 +22,7 @@ public class Program {
 		// O console do eclipse n�o reconhece as cores rode direto pelo terminal caso ele tenha reconhecimento de cores.
 		
 		
-		while (true) {
+		while (!cm.getCheckMate()) {
 			try {
 				UI.clearSreen();
 				UI.printMatch(cm, captured);
@@ -52,7 +52,12 @@ public class Program {
 				System.out.println(e.getMessage());
 				scn.nextLine();
 			}
+			
+			
 		}
+		
+		UI.clearSreen();
+		UI.printMatch(cm, captured);
 		
 	}
 

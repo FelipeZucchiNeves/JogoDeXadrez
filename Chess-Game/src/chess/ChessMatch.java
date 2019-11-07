@@ -16,6 +16,7 @@ public class ChessMatch {
 	private Color currentPlayer;
 	private int turn;
 	private boolean check;
+	private boolean checkMate;
 	
 	private List <Piece> piecesOnTheBoard;
 	private List <Piece> capturedPieces;
@@ -32,6 +33,10 @@ public class ChessMatch {
 	
 	public boolean getCheck() {
 		return check;
+	}
+	
+	public boolean getCheckMate() {
+		return checkMate;
 	}
 	
 	public int getTurn() {
@@ -78,7 +83,9 @@ public class ChessMatch {
 		
 		check = (testCheck(opponent(currentPlayer)))?true : false;
 		
-		nextTurn();
+		if(testCheckMate(opponent(currentPlayer))) checkMate = true;
+		else nextTurn();
+		
 		return (ChessPiece) capturedPiece;
 	}
 
@@ -166,6 +173,31 @@ public class ChessMatch {
 			}
 		}
 		return false;
+	}
+	
+	private boolean testCheckMate(Color color) {
+		if(!testCheck(color)) return false;
+		List<Piece> list = piecesOnTheBoard.stream().filter(x->((ChessPiece)x).getColor() == color).collect(Collectors.toList());
+		for (Piece piece : list) {
+			boolean [][] matriz = piece.possibleMove();
+			for(int i = 0; i< board.getRows(); i++) {
+				for(int j = 0; j<board.getColumns(); j++) {
+					if(matriz[i][j]) {
+						// Devido arquitetura temos que fazer um downCast para acesso ao método protected;
+						Position source = ((ChessPiece)piece).getChessPosition().toPosition(); 
+						Position target = new Position(i,j);
+						Piece capturedPiece = makeMove(source, target);
+						//Faz o movimento e depois testa se ele ainda esta em CHECK
+						boolean testCheck = testCheck(color);
+						undoMovie(source, target, capturedPiece);
+						//Desfaz o movimento e agora testa se ele continua em check
+						if(!testCheck) return false;
+					}
+				}
+				
+			}
+		}
+		return true;
 	}
 	
 	

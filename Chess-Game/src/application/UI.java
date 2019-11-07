@@ -33,8 +33,7 @@ public class UI {
 	public static final String ANSI_PURPLE_BACKGROUND = "\u001B[45m";
 	public static final String ANSI_CYAN_BACKGROUND = "\u001B[46m";
 	public static final String ANSI_WHITE_BACKGROUND = "\u001B[47m";
-	
-	
+
 	public static void clearSreen() {
 		System.out.println("\033[H\033[2J");
 		System.out.flush();
@@ -52,7 +51,7 @@ public class UI {
 	}
 
 	private static void printPiece(ChessPiece piece, boolean background) {
-		if(background == true){
+		if (background == true) {
 			System.out.print(ANSI_BLUE_BACKGROUND);
 		}
 		if (piece == null) {
@@ -88,23 +87,31 @@ public class UI {
 		}
 		System.out.println("  a b c d e f g h");
 	}
-	
+
 	public static void printMatch(ChessMatch chessMatch, List<ChessPiece> captured) {
 		printBoard(chessMatch.getPieces());
 		System.out.println();
 		printCapturedPieces(captured);
 		System.out.println();
 		System.out.println("Turno: " + chessMatch.getTurn());
-		System.out.println("Esperando jogador "+ chessMatch.getCurrentPlayer());
-		if(chessMatch.getCheck()) {
-			System.out.println("CHECK!");
+		System.out.println("Esperando jogador " + chessMatch.getCurrentPlayer());
+		if (!chessMatch.getCheckMate()) {
+			System.out.println("Esperando jogador: " + chessMatch.getCurrentPlayer());
+			if (chessMatch.getCheck()) {
+				System.out.println("CHECK!");
+			}
+		}else {
+			System.out.println("CHECKMATE");
+			System.out.println("VENCEDOR: "+ chessMatch.getCurrentPlayer());
 		}
 	}
-	
-	public static void printCapturedPieces (List<ChessPiece> captured) {
-		List<ChessPiece> white = captured.stream().filter(x -> x.getColor()==Color.WHITE).collect(Collectors.toList());
-		List<ChessPiece> black = captured.stream().filter(x -> x.getColor()==Color.BLACK).collect(Collectors.toList());
-		
+
+	public static void printCapturedPieces(List<ChessPiece> captured) {
+		List<ChessPiece> white = captured.stream().filter(x -> x.getColor() == Color.WHITE)
+				.collect(Collectors.toList());
+		List<ChessPiece> black = captured.stream().filter(x -> x.getColor() == Color.BLACK)
+				.collect(Collectors.toList());
+
 		System.out.println("Peças Capturadas: ");
 		System.out.println("White: ");
 		System.out.println(ANSI_WHITE);
@@ -114,7 +121,7 @@ public class UI {
 		System.out.println(ANSI_RED);
 		System.out.println(Arrays.toString(black.toArray()));
 		System.out.println(ANSI_RESET);
-		
+
 	}
 
 }
