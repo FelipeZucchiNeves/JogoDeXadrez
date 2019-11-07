@@ -20,7 +20,6 @@ public class Program {
 		List<ChessPiece> captured = new ArrayList<ChessPiece>();
 		
 		// O console do eclipse n�o reconhece as cores rode direto pelo terminal caso ele tenha reconhecimento de cores.
-		// teste
 		
 		
 		while (true) {
