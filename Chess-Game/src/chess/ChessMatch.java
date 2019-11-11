@@ -8,6 +8,7 @@ import boardgame.Board;
 import boardgame.Piece;
 import boardgame.Position;
 import chess.pieces.King;
+import chess.pieces.Pawn;
 import chess.pieces.Rook;
 
 public class ChessMatch {
@@ -17,6 +18,7 @@ public class ChessMatch {
 	private int turn;
 	private boolean check;
 	private boolean checkMate;
+	private ChessPiece enPassantVulnerable;
 
 	private List<Piece> piecesOnTheBoard;
 	private List<Piece> capturedPieces;
@@ -45,6 +47,10 @@ public class ChessMatch {
 
 	public Color getCurrentPlayer() {
 		return currentPlayer;
+	}
+	
+	public ChessPiece getEnPassantVulnerable() {
+		return enPassantVulnerable;
 	}
 
 	public ChessPiece[][] getPieces() {
@@ -77,13 +83,20 @@ public class ChessMatch {
 			undoMovie(source, target, capturedPiece);
 			throw new ChessException("Você não pode fazer este movimento");
 		}
-
+		
+		ChessPiece movedPiece = (ChessPiece)board.piece(target);
+		
+		
 		check = (testCheck(opponent(currentPlayer))) ? true : false;
 
 		if (testCheckMate(opponent(currentPlayer)))
 			checkMate = true;
 		else
 			nextTurn();
+		
+		//Verificando movimento especial en passsant
+		if(movedPiece instanceof Pawn && (target.getRow()==source.getRow()-2 || target.getRow()==source.getRow()+2)) enPassantVulnerable = movedPiece;
+		else enPassantVulnerable = null;
 
 		return (ChessPiece) capturedPiece;
 	}
@@ -120,6 +133,21 @@ public class ChessMatch {
 			board.placePiece(rook, targetTorre);
 			rook.increaseMoveCount();
 		}
+		
+		// Movimento especial EnPassant Esquerda
+		if(p instanceof Pawn) {
+			if(source.getColumn() != target.getColumn() && capturedPiece == null) {
+				Position posPeao;
+				if(p.getColor()==Color.WHITE) {
+					posPeao = new Position(target.getRow()+1, target.getColumn());
+				}else {
+					posPeao = new Position(target.getRow()-1, target.getColumn());
+				}
+				capturedPiece = board.removePiece(posPeao);
+				capturedPieces.add(capturedPiece);
+				piecesOnTheBoard.remove(capturedPiece);
+			}
+		}
 
 		return capturedPiece;
 	}
@@ -151,6 +179,22 @@ public class ChessMatch {
 			ChessPiece rook = (ChessPiece) board.removePiece(targetTorre);
 			board.placePiece(rook, sourceTorre);
 			rook.decreaseMoveCount();
+		}
+		
+		//Desfazer EnPassant 
+		
+		if(p instanceof Pawn) {
+			if(source.getColumn() != target.getColumn() && capturedPiece == enPassantVulnerable) {
+				ChessPiece peao = (ChessPiece)board.removePiece(target);
+				
+				Position posPeao;
+				if(p.getColor()==Color.WHITE) {
+					posPeao = new Position(3, target.getColumn());
+				}else {
+					posPeao = new Position(4, target.getColumn());
+				}
+				board.placePiece(peao, posPeao);
+			}
 		}
 	}
 
