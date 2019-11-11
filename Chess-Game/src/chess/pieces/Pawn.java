@@ -10,7 +10,7 @@ public class Pawn extends ChessPiece{
 
 	private ChessMatch chessMatch;
 	
-	public Pawn(Board board, Color color) {
+	public Pawn(Board board, Color color, ChessMatch chessMatch) {
 		super(board, color);
 		this.chessMatch = chessMatch;
 		// TODO Auto-generated constructor stub
