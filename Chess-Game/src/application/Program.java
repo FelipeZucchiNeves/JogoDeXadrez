@@ -44,6 +44,12 @@ public class Program {
 					captured.add(capturedPiece);
 				}
 				
+				if(cm.getPromoted() != null) {
+					System.out.println("Digite a Letra da peça para qual deseja promover o Peão (B/N/R/Q)");
+					String string = scn.nextLine();
+					cm.replacePromotedPiece(string);
+				}
+				
 				
 			}catch(ChessException e ) {
 				System.out.println(e.getMessage());

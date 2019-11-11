@@ -1,5 +1,6 @@
 package chess;
 
+import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -7,8 +8,11 @@ import java.util.stream.Collectors;
 import boardgame.Board;
 import boardgame.Piece;
 import boardgame.Position;
+import chess.pieces.Bishop;
 import chess.pieces.King;
+import chess.pieces.Knight;
 import chess.pieces.Pawn;
+import chess.pieces.Queen;
 import chess.pieces.Rook;
 
 public class ChessMatch {
@@ -19,6 +23,7 @@ public class ChessMatch {
 	private boolean check;
 	private boolean checkMate;
 	private ChessPiece enPassantVulnerable;
+	private ChessPiece promoted;
 
 	private List<Piece> piecesOnTheBoard;
 	private List<Piece> capturedPieces;
@@ -51,6 +56,10 @@ public class ChessMatch {
 	
 	public ChessPiece getEnPassantVulnerable() {
 		return enPassantVulnerable;
+	}
+	
+	public ChessPiece getPromoted() {
+		return promoted;
 	}
 
 	public ChessPiece[][] getPieces() {
@@ -86,6 +95,17 @@ public class ChessMatch {
 		
 		ChessPiece movedPiece = (ChessPiece)board.piece(target);
 		
+		//Checando a promoção da peça
+		promoted = null;
+		if(movedPiece instanceof Pawn) {
+			if((movedPiece.getColor()==Color.WHITE && target.getRow()==0)||(movedPiece.getColor()==Color.BLACK && target.getRow()==7)){
+				promoted = (ChessPiece)board.piece(target);
+				promoted = replacePromotedPiece("Q");
+			}
+		}
+		
+		
+		
 		
 		check = (testCheck(opponent(currentPlayer))) ? true : false;
 
@@ -100,6 +120,7 @@ public class ChessMatch {
 
 		return (ChessPiece) capturedPiece;
 	}
+
 
 	private void validateTargetPosition(Position source, Position target) {
 		if (!board.piece(source).possibleMoves(target))
@@ -280,5 +301,29 @@ public class ChessMatch {
 		}
 		return true;
 	}
+	
+	
+	
+	public ChessPiece replacePromotedPiece(String string) {
+		if(promoted == null)throw new IllegalStateException("Não há peça para ser promovida");
+		if(!string.equals("B")&& !string.equals("N")&& !string.equals("R")&& !string.equals("Q")) throw new InvalidParameterException("Tipo de peça Inválida");
+		
+		Position pos = promoted.getChessPosition().toPosition();
+		Piece p = board.removePiece(pos);
+		piecesOnTheBoard.remove(p);
+		
+		ChessPiece newPiece = newPiece(string, promoted.getColor());
+		board.placePiece(newPiece, pos);
+		piecesOnTheBoard.add(newPiece);
+		return newPiece;
+	}
+	
+	private ChessPiece newPiece (String string, Color color) {
+		if(string.equals("B")) return new Bishop(board, color);
+		if(string.equals("N")) return new Knight(board, color);
+		if(string.equals("Q")) return new Queen(board, color);
+		return new Rook(board, color);
+	}
+
 
 }
